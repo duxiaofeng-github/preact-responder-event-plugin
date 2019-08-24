@@ -348,3 +348,9 @@ let plugins: {
 export const injectEventPluginsByName = (injectedPlugins) => {
   plugins = Object.assign({}, plugins, injectedPlugins);
 };
+
+export default {
+  injectEventPluginsByName,
+  ResponderEventPlugin,
+  ResponderTouchHistoryStore,
+};

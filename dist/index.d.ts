@@ -51,4 +51,13 @@ export declare const ResponderTouchHistoryStore: {
     };
 };
 export declare const injectEventPluginsByName: (injectedPlugins: any) => void;
-export {};
+declare const _default: {
+    injectEventPluginsByName: (injectedPlugins: any) => void;
+    ResponderEventPlugin: IResponderEventPlugin;
+    ResponderTouchHistoryStore: {
+        touchHistory: {
+            numberActiveTouches: number;
+        };
+    };
+};
+export default _default;
