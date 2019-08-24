@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "sourceMap": false,
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "declaration": true,
+    "module": "esnext",
+    "target": "es5",
+    "lib": ["es2016", "dom"]
+  }
+}
