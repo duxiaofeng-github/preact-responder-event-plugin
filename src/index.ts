@@ -1,12 +1,9 @@
-import Preact, { VNode } from "preact";
-
-const options = Preact.options;
+import { VNode, options } from "preact";
 
 let root: VNode;
 
 const oldRootHook = (options as any)._root;
 
-// TODO: fix hack
 (options as any)._root = (node: VNode) => {
   root = node;
 
@@ -21,7 +18,6 @@ const oldRootHook = (options as any)._root;
 
 let oldCommitHook = (options as any)._commit;
 
-// TODO: fix hack
 (options as any)._commit = (node: VNode) => {
   if (root && plugins.ResponderEventPlugin) {
     const vnodes = [root];
@@ -31,12 +27,14 @@ let oldCommitHook = (options as any)._commit;
 
       // it's a real vnode reflect to the dom
       if (typeof (vnode as any).type === "string") {
-        (vnode as any)._dom._vnode = vnode; // TODO: fix hack
+        (vnode as any)._dom._vnode = vnode;
       }
 
-      for (let child of (vnode as any)._children) {
-        if (child != null) {
-          vnodes.push(child);
+      if ((vnode as any)._children != null && (vnode as any)._children.length != null) {
+        for (let child of (vnode as any)._children) {
+          if (child != null) {
+            vnodes.push(child);
+          }
         }
       }
     }
@@ -53,59 +51,43 @@ enum ProcessType {
 const startResponderKey = "onResponderStart";
 const moveResponderKey = "onResponderMove";
 const endResponderKey = "onResponderEnd";
-const startNegotiatorKeys = ["onStartShouldSetResponderCapture", "onStartShouldSetResponder"];
-const moveNegotiatorKeys = [
-  "onMoveShouldSetResponderCapture",
-  "onSelectionChangeShouldSetResponderCapture",
-  "onMoveShouldSetResponder",
-  "onSelectionChangeShouldSetResponder",
-];
-const scrollNegotiatorKeys = ["onScrollShouldSetResponderCapture", "onScrollShouldSetResponder"];
-const startDefinition = getEventDefinition(startNegotiatorKeys, startResponderKey, ProcessType.start);
-const moveDefinition = getEventDefinition(moveNegotiatorKeys, moveResponderKey, ProcessType.move);
-const scrollDefinition = getEventDefinition(scrollNegotiatorKeys, moveResponderKey, ProcessType.move);
-const endDefinition = getEventDefinition(null, endResponderKey, ProcessType.end);
+const startCheckerKeys = ["onStartShouldSetResponderCapture", "onStartShouldSetResponder"];
+const moveCheckerKeys = ["onMoveShouldSetResponderCapture", "onMoveShouldSetResponder"];
+const startDefinition = getEventDefinition(startCheckerKeys, startResponderKey, ProcessType.start);
+const moveDefinition = getEventDefinition(moveCheckerKeys, moveResponderKey, ProcessType.move);
+const endDefinition = getEventDefinition([], endResponderKey, ProcessType.end);
 
 interface IDefinition {
-  negotiatorKeys: string[];
+  checkerKeys: string[];
   responderKey: string;
   process: ProcessType;
 }
 
-interface IResponderEventEvents {
-  touchstart: IDefinition;
-  mousedown: IDefinition;
-  touchmove: IDefinition;
-  mousemove: IDefinition;
-  selectionchange: IDefinition;
-  scroll: IDefinition;
-  touchend: IDefinition;
-  mouseup: IDefinition;
+interface IResponderEvents {
+  [key: string]: IDefinition;
 }
 
-const responderEventEvents: IResponderEventEvents = {
+const responderEvents: IResponderEvents = {
   touchstart: startDefinition,
   mousedown: startDefinition,
   touchmove: moveDefinition,
   mousemove: moveDefinition,
-  selectionchange: moveDefinition,
-  scroll: scrollDefinition,
   touchend: endDefinition,
   mouseup: endDefinition,
 };
 
-function getEventDefinition(negotiatorKeys: string[], responderKey: string, process: ProcessType) {
-  return { negotiatorKeys, responderKey, process };
+function getEventDefinition(checkerKeys: string[], responderKey: string, process: ProcessType) {
+  return { checkerKeys, responderKey, process };
 }
 
 function addEventListenerToDocument() {
-  for (let event in responderEventEvents) {
+  for (let event in responderEvents) {
     document.addEventListener(event, eventListener);
   }
 }
 
 function removeEventListenerToDocument() {
-  for (let event in responderEventEvents) {
+  for (let event in responderEvents) {
     document.removeEventListener(event, eventListener);
   }
 }
@@ -126,15 +108,13 @@ function getEventPath(e: IEvent) {
   return path;
 }
 
-interface INegotiators {
-  onMoveShouldSetResponderCapture?: (e: IEvent) => boolean;
-  onSelectionChangeShouldSetResponderCapture?: (e: IEvent) => boolean;
-  onMoveShouldSetResponder?: (e: IEvent) => boolean;
-  onSelectionChangeShouldSetResponder?: (e: IEvent) => boolean;
-  onStartShouldSetResponderCapture?: (e: IEvent) => boolean;
-  onStartShouldSetResponder?: (e: IEvent) => boolean;
-  onScrollShouldSetResponderCapture?: (e: IEvent) => boolean;
-  onScrollShouldSetResponder?: (e: IEvent) => boolean;
+type IChecker = (e: IEvent) => boolean;
+
+interface ICheckers {
+  onMoveShouldSetResponderCapture?: IChecker;
+  onMoveShouldSetResponder?: IChecker;
+  onStartShouldSetResponderCapture?: IChecker;
+  onStartShouldSetResponder?: IChecker;
 }
 
 interface IResponders {
@@ -144,61 +124,64 @@ interface IResponders {
 }
 
 interface IProcessors {
-  onResponderTerminationRequest?: (e: IEvent) => boolean;
+  onResponderTerminationRequest?: IChecker;
   onResponderTerminate?: (e: IEvent) => void;
   onResponderGrant?: (e: IEvent) => void;
   onResponderReject?: (e: IEvent) => void;
   onResponderRelease?: (e: IEvent) => void;
 }
 
-type IProps = INegotiators & IResponders & IProcessors;
+type IProps = ICheckers & IResponders & IProcessors;
 
-interface INegotiatorWrapper {
+interface ICheckerWrapper {
   isCapture: boolean;
-  negotiator: (e: IEvent) => boolean;
+  checker: IChecker;
   props: IProps;
+  dom: HTMLElement;
 }
 
 type IEvent = TouchEvent;
 
-function getNegotiatorsWithPropsByEventPath(negotiatorKey: string, eventPath: HTMLElement[], isCapture: boolean) {
-  const negotiators: INegotiatorWrapper[] = [];
+function getCheckersWithPropsByEventPath(checkerKey: string, eventPath: HTMLElement[], isCapture: boolean) {
+  const checkers: ICheckerWrapper[] = [];
 
-  for (let ele of eventPath) {
-    const vnode = (ele as any)._vnode;
+  for (let dom of eventPath) {
+    const vnode = (dom as any)._vnode;
 
     if (vnode != null) {
       if (typeof vnode.props === "object") {
-        const negotiator = vnode.props[negotiatorKey];
-        if (negotiator != null) {
-          negotiators.push({
+        const checker = vnode.props[checkerKey];
+
+        if (checker != null) {
+          checkers.push({
             isCapture,
-            negotiator,
+            checker,
             props: vnode.props as IProps,
+            dom,
           });
         }
       }
     }
   }
 
-  return negotiators;
+  return checkers;
 }
 
-function getNegotiators(eventType: string, eventPath: HTMLElement[], eventPathReverse: HTMLElement[]) {
-  const responderEvent = responderEventEvents[eventType];
-  const negotiatorKeys = responderEvent.negotiatorKeys;
-  const negotiators: INegotiatorWrapper[] = [];
+function getCheckers(eventType: string, eventPath: HTMLElement[], eventPathReverse: HTMLElement[]) {
+  const definition = responderEvents[eventType];
+  const checkerKeys = definition.checkerKeys;
+  const checkers: ICheckerWrapper[] = [];
 
-  for (let key of negotiatorKeys) {
-    // invoke negotiate capture from root
+  for (let key of checkerKeys) {
+    // invoke capture checkers from root
     if (key.indexOf("Capture") > -1) {
-      negotiators.push(...getNegotiatorsWithPropsByEventPath(key, eventPathReverse, true));
+      checkers.push(...getCheckersWithPropsByEventPath(key, eventPathReverse, true));
     } else {
-      negotiators.push(...getNegotiatorsWithPropsByEventPath(key, eventPath, false));
+      checkers.push(...getCheckersWithPropsByEventPath(key, eventPath, false));
     }
   }
 
-  return negotiators;
+  return checkers;
 }
 
 function getEventPaths(e: IEvent) {
@@ -207,33 +190,52 @@ function getEventPaths(e: IEvent) {
   return { eventPath, eventPathReverse };
 }
 
-function setCurrentResponder(e: IEvent, responderEvent: IDefinition, props: IProps) {
-  plugins.ResponderEventPlugin.current = {
-    responder: props[responderEvent.responderKey],
-    eventType: e.type,
-    responderEvent,
-    props,
-  };
+function setEvent(e: IEvent, responderKey: keyof IProps, props: IProps) {
+  const responder = props[responderKey];
+
+  if (plugins.ResponderEventPlugin!.view) {
+    plugins.ResponderEventPlugin!.view!.event = {
+      responder,
+      type: e.type,
+    };
+  }
 }
 
-function handleResponderTransferRequest(e: IEvent, responderEvent: IDefinition, props: IProps) {
-  const { onResponderTerminationRequest, onResponderTerminate } = plugins.ResponderEventPlugin.current.props;
-  const { onResponderGrant, onResponderReject } = props;
+function initView(e: IEvent, responderKey: keyof IProps, props: IProps, dom: HTMLElement) {
+  const responder = props[responderKey];
+
+  plugins.ResponderEventPlugin!.view = {
+    event: {
+      responder,
+      type: e.type,
+    },
+    props,
+    dom,
+  };
+
+  const { onResponderGrant } = props;
+
+  if (onResponderGrant) onResponderGrant(e);
+}
+
+function handleResponderTransferRequest(e: IEvent, definition: IDefinition, props: IProps, dom: HTMLElement) {
+  const view = getCurrentView();
+  // view can't be null here
+  const { onResponderTerminate, onResponderTerminationRequest } = view!.props;
+  const { onResponderReject } = props;
 
   if (onResponderTerminationRequest) {
     const allowTransfer = onResponderTerminationRequest(e);
 
     if (allowTransfer) {
-      if (onResponderGrant) onResponderGrant(e);
+      initView(e, definition.responderKey as keyof IProps, props, dom);
       if (onResponderTerminate) onResponderTerminate(e);
-      setCurrentResponder(e, responderEvent, props);
     } else {
       if (onResponderReject) onResponderReject(e);
     }
   } else {
-    if (onResponderGrant) onResponderGrant(e);
+    initView(e, definition.responderKey as keyof IProps, props, dom);
     if (onResponderTerminate) onResponderTerminate(e);
-    setCurrentResponder(e, responderEvent, props);
   }
 }
 
@@ -241,93 +243,138 @@ function handleActiveTouches(e: IEvent) {
   ResponderTouchHistoryStore.touchHistory.numberActiveTouches = e.touches.length;
 }
 
-function isStartish(responderEvent: IDefinition) {
-  return responderEvent.process === ProcessType.start;
+function isStartish(definition: IDefinition) {
+  return definition.process === ProcessType.start;
 }
 
-function isMoveish(responderEvent: IDefinition) {
-  return responderEvent.process === ProcessType.move;
+function isMoveish(definition: IDefinition) {
+  return definition.process === ProcessType.move;
 }
 
-function isEndish(responderEvent: IDefinition) {
-  return responderEvent.process === ProcessType.end;
+function isEndish(definition: IDefinition) {
+  return definition.process === ProcessType.end;
 }
 
-function executeResponder(e: IEvent, negotiators: INegotiatorWrapper[]) {
-  const responderEvent: IDefinition = responderEventEvents[e.type];
+function getCurrentView() {
+  if (plugins.ResponderEventPlugin) {
+    return plugins.ResponderEventPlugin.view;
+  }
+}
+
+function getCurrentEvent() {
+  const view = getCurrentView();
+  if (view) {
+    return view.event;
+  }
+}
+
+function getCurrentResponder() {
+  const event = getCurrentEvent();
+  if (event) {
+    return event.responder;
+  }
+}
+
+function executeResponder(e: IEvent, checker: ICheckerWrapper[]) {
+  const definition: IDefinition = responderEvents[e.type];
 
   handleActiveTouches(e);
 
-  if (isStartish(responderEvent) || isMoveish(responderEvent)) {
-    for (let item of negotiators) {
+  if (isStartish(definition) || isMoveish(definition)) {
+    for (let item of checker) {
       e = { ...e, bubbles: !item.isCapture };
-      const requireToBeResponder = item.negotiator(e);
+
+      const requireToBeResponder = item.checker(e);
 
       if (requireToBeResponder) {
-        if (plugins.ResponderEventPlugin.current == null) {
-          setCurrentResponder(e, responderEvent, item.props);
+        const view = getCurrentView();
+
+        // if no responding view, set it and call granted
+        if (view == null) {
+          initView(e, definition.responderKey as keyof IProps, item.props, item.dom);
         } else {
-          if (
-            // transfer responder from starting to moving or from moving to starting
-            // on destop you can move a mouse and then click
-            plugins.ResponderEventPlugin.current.responderEvent.process !== responderEvent.process
-          ) {
-            setCurrentResponder(e, responderEvent, item.props);
+          // if same view is responding, set new responder
+          if (view.dom === item.dom) {
+            setEvent(e, definition.responderKey as keyof IProps, item.props);
           } else {
-            handleResponderTransferRequest(e, responderEvent, item.props);
+            // if other view wants to response, start to negotiate
+            handleResponderTransferRequest(e, definition, item.props, item.dom);
           }
         }
       }
     }
+
+    const responder = getCurrentResponder();
+
+    if (responder) {
+      responder(e);
+      plugins.ResponderEventPlugin!.view!.event = null;
+    }
   }
 
-  plugins.ResponderEventPlugin.current.responder(e);
+  if (isEndish(definition)) {
+    const view = getCurrentView();
 
-  if (isEndish(responderEvent)) {
-    if (ResponderTouchHistoryStore.touchHistory.numberActiveTouches === 0) {
-      const { onResponderRelease } = plugins.ResponderEventPlugin.current.props;
+    if (view != null) {
+      const { onResponderRelease, onResponderEnd } = view.props;
 
-      if (onResponderRelease) {
-        onResponderRelease(e);
+      if (onResponderEnd) {
+        onResponderEnd(e);
       }
 
-      plugins.ResponderEventPlugin.current.responder = null;
+      if (ResponderTouchHistoryStore.touchHistory.numberActiveTouches === 0) {
+        if (onResponderRelease) {
+          onResponderRelease(e);
+        }
+
+        if (plugins.ResponderEventPlugin) {
+          plugins.ResponderEventPlugin.view = null;
+        }
+      }
     }
   }
 }
 
-function eventListener(e: IEvent) {
+function eventListener(e: Event) {
   if (!plugins.ResponderEventPlugin) return;
 
-  const { nativeEvent } = plugins.ResponderEventPlugin.extractEvents(e.type, null, e, e.target as HTMLElement);
+  const result = plugins.ResponderEventPlugin.extractEvents(e.type, {}, e, e.target as HTMLElement);
+
+  if (result == null) {
+    return;
+  }
+
+  const { nativeEvent } = result;
 
   const { eventPath, eventPathReverse } = getEventPaths(nativeEvent);
-  const negotiators = getNegotiators(nativeEvent.type, eventPath as HTMLElement[], eventPathReverse as HTMLElement[]);
+  const checkers = getCheckers(nativeEvent.type, eventPath as HTMLElement[], eventPathReverse as HTMLElement[]);
 
-  executeResponder(nativeEvent, negotiators);
+  executeResponder(nativeEvent, checkers);
 }
 
 interface IResponderEventPlugin {
-  current: {
-    responder: (e: IEvent) => void;
-    eventType: string;
-    responderEvent: IDefinition;
+  view: {
+    dom: HTMLElement;
+    event: {
+      responder: ((e: IEvent) => void) | undefined;
+      type: string;
+    } | null;
     props: IProps;
-  };
+  } | null;
   extractEvents: (
     eventType: string,
     targetInst: IProps,
-    nativeEvent: IEvent,
+    nativeEvent: Event,
     nativeEventTarget: HTMLElement
   ) => { nativeEvent: IEvent };
   eventTypes: any;
 }
 
 export const ResponderEventPlugin: IResponderEventPlugin = {
-  current: null,
-  extractEvents: (eventType: string, props: IProps, nativeEvent: IEvent, nativeEventTarget: HTMLElement) => {
+  view: null,
+  extractEvents: (eventType: string, props: IProps, nativeEvent: Event, nativeEventTarget: HTMLElement) => {
     return {
-      nativeEvent,
+      nativeEvent: nativeEvent as IEvent,
     };
   },
   eventTypes: {
@@ -341,11 +388,13 @@ export const ResponderTouchHistoryStore = {
   touchHistory: { numberActiveTouches: 0 },
 };
 
-let plugins: {
+interface IPlugins {
   ResponderEventPlugin?: IResponderEventPlugin;
-} = {};
+}
 
-export const injectEventPluginsByName = (injectedPlugins) => {
+let plugins: IPlugins = {};
+
+export const injectEventPluginsByName = (injectedPlugins: IPlugins) => {
   plugins = Object.assign({}, plugins, injectedPlugins);
 };
 
