@@ -6,21 +6,25 @@ It brings [preact](https://github.com/preactjs/preact) and [react-native-web](ht
 
 So you can build a react native app into web app by using preact now.
 
+It's 3KB after minified, so i think you don't need to worry about the size.
+
 # Installation
 
+It depends on preact 10 and react-native-web, so you need to install them too.
+
 ```
-npm i preact-responder-event-plugin
+npm i preact-responder-event-plugin react-native-web preact@next
 ```
 
 or
 
 ```
-yarn add preact-responder-event-plugin
+yarn add preact-responder-event-plugin react-native-web preact@next
 ```
 
 # Usage
 
-You only need to add some aliases in your webpack config to replace the `react-native`, `react`, `react-dom` implicitly. Of course you need to install `react-native-web` and `preact` first.
+You only need to add some aliases in your webpack config to replace the `react-native`, `react`, `react-dom` implicitly.
 
 ```
   resolve: {

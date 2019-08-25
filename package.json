@@ -14,9 +14,11 @@
     "update-mangle": "wget https://raw.githubusercontent.com/preactjs/preact/master/mangle.json",
     "build": "yarn clean && yarn update-mangle && microbundle build --raw --external preact --format es --no-sourcemap"
   },
-  "devDependencies": {
-    "microbundle": "^0.11.0",
+  "peerDependencies": {
     "preact": "^10.0.0-rc.1"
+  },
+  "devDependencies": {
+    "microbundle": "^0.11.0"
   },
   "dependencies": {}
 }
