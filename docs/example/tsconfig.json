@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react",
+    "lib": ["es6", "dom"],
+    "moduleResolution": "node",
+    "strict": true,
+    "target": "es5",
+    "baseUrl": "./",
+    "paths": {
+      "*": ["*", "*.web", "*.native", "*.ios", "*.android"]
+    }
+  },
+  "exclude": ["node_modules", "babel.config.js", "metro.config.js", "jest.config.js"]
+}
