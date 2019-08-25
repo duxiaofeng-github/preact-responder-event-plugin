@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "webpack-dev-server --hot",
-    "dist": "webpack --mode production"
+    "build": "webpack --mode production"
   },
   "devDependencies": {
     "@types/react": "^16.9.2",
@@ -18,7 +18,6 @@
     "webpack-dev-server": "^3.8.0"
   },
   "dependencies": {
-    "preact-responder-event-plugin": "file:../../",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-native": "^0.60.5",

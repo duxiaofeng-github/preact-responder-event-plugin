@@ -26,7 +26,6 @@ module.exports = {
       "react-native$": "react-native-web",
       react$: "preact/compat",
       "react-dom$": "preact/compat",
-      preact$: "preact",
       "react-dom/unstable-native-dependencies$": "preact-responder-event-plugin",
     },
   },
