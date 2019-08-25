@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Text, Switch, GestureResponderEvent } from "react-native";
+import { View, StyleSheet, Text, Switch, GestureResponderEvent, Platform } from "react-native";
 
 interface IProps {}
 
@@ -56,7 +56,17 @@ export class Container extends React.Component<IProps, IState> {
     return (
       <View style={[style.container, { userSelect: "none" } as any]}>
         <View style={style.title}>
-          <Text style={style.titleText}>Preact Responder Event Plugin Demo</Text>
+          <View
+            onStartShouldSetResponder={() => true}
+            onResponderStart={() => {
+              if (Platform.OS === "web")
+                location.href = "https://github.com/duxiaofeng-github/preact-responder-event-plugin";
+            }}
+          >
+            <Text accessibilityRole="link" style={style.titleText}>
+              Preact Responder Event Plugin Demo
+            </Text>
+          </View>
         </View>
         <View style={style.content}>
           <View
