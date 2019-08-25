@@ -5335,6 +5335,16 @@ posix-character-classes@^0.1.0:
   resolved "https://registry.npm.taobao.org/posix-character-classes/download/posix-character-classes-0.1.1.tgz#01eac0fe3b5af71a2a6c02feabb8c1fef7e00eab"
   integrity sha1-AerA/jta9xoqbAL+q7jB/vfgDqs=
 
+preact-responder-event-plugin@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.npmjs.org/preact-responder-event-plugin/-/preact-responder-event-plugin-1.0.0.tgz#e8d68bffb6de9d3146cb73f08eda418056fcca6a"
+  integrity sha512-LPCZvr59HadjDgpQfO3VhDWYL3l5byvsBGhQtXAKfpjHPKIskYNgHEqXcO5EZyvb7Lud/H6mi4xRuCjfy5zmcw==
+
+preact@^10.0.0-rc.1:
+  version "10.0.0-rc.1"
+  resolved "https://registry.npmjs.org/preact/-/preact-10.0.0-rc.1.tgz#bae4419f8e289c327504d4ee6e734c377983548c"
+  integrity sha512-DyG8ySCbrQZ8w4cSyxnofM6yH/hzyYLHmIrE3xL1FjSCX4DpvVmP7DTpkV535FSQX0d2zOscb7DCIY+crBtxow==
+
 pretty-error@^2.0.2:
   version "2.1.1"
   resolved "https://registry.npm.taobao.org/pretty-error/download/pretty-error-2.1.1.tgz#5f4f87c8f91e5ae3f3ba87ab4cf5e03b1a17f1a3"
