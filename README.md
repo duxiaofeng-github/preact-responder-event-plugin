@@ -20,7 +20,7 @@ yarn add preact-responder-event-plugin
 
 # Usage
 
-You only need to add some aliases in your webpack config to replace the `react-native`, `react`, `react-dom` implicitly. of course you need to install `react-native-web` and `preact` first.
+You only need to add some aliases in your webpack config to replace the `react-native`, `react`, `react-dom` implicitly. Of course you need to install `react-native-web` and `preact` first.
 
 ```
   resolve: {
