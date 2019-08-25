@@ -1,6 +1,6 @@
 {
   "name": "preact-responder-event-plugin",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "a library combine react-native-web and preact together",
   "license": "MIT",
   "main": "dist/index.js",
