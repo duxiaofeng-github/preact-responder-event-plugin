@@ -12,8 +12,7 @@
     "dev": "microbundle watch --raw --external preact --format es --no-sourcemap",
     "clean": "rm -rf dist mangle.json",
     "update-mangle": "wget https://raw.githubusercontent.com/preactjs/preact/master/mangle.json",
-    "build": "yarn clean && yarn update-mangle && microbundle build --raw --external preact --format es --no-sourcemap",
-    "build:docs": "cd docs && ls | egrep -v 'example|mds|mkdocs.yml' | xargs rm -rfv && mkdocs build && mv site/* . && rm -rf site"
+    "build": "yarn clean && yarn update-mangle && microbundle build --raw --external preact --format es --no-sourcemap"
   },
   "devDependencies": {
     "microbundle": "^0.11.0",
