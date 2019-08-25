@@ -131,3 +131,7 @@ to return true:wantsResponderID|                            |
                                |                            |
                                +                            +
 ```
+
+# LICENSE
+
+MIT
