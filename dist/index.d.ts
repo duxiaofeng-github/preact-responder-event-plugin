@@ -1,22 +1,9 @@
-declare enum ProcessType {
-    start = 0,
-    move = 1,
-    end = 2
-}
-interface IDefinition {
-    negotiatorKeys: string[];
-    responderKey: string;
-    process: ProcessType;
-}
-interface INegotiators {
-    onMoveShouldSetResponderCapture?: (e: IEvent) => boolean;
-    onSelectionChangeShouldSetResponderCapture?: (e: IEvent) => boolean;
-    onMoveShouldSetResponder?: (e: IEvent) => boolean;
-    onSelectionChangeShouldSetResponder?: (e: IEvent) => boolean;
-    onStartShouldSetResponderCapture?: (e: IEvent) => boolean;
-    onStartShouldSetResponder?: (e: IEvent) => boolean;
-    onScrollShouldSetResponderCapture?: (e: IEvent) => boolean;
-    onScrollShouldSetResponder?: (e: IEvent) => boolean;
+declare type IChecker = (e: IEvent) => boolean;
+interface ICheckers {
+    onMoveShouldSetResponderCapture?: IChecker;
+    onMoveShouldSetResponder?: IChecker;
+    onStartShouldSetResponderCapture?: IChecker;
+    onStartShouldSetResponder?: IChecker;
 }
 interface IResponders {
     onResponderStart?: (e: IEvent) => void;
@@ -24,22 +11,24 @@ interface IResponders {
     onResponderEnd?: (e: IEvent) => void;
 }
 interface IProcessors {
-    onResponderTerminationRequest?: (e: IEvent) => boolean;
+    onResponderTerminationRequest?: IChecker;
     onResponderTerminate?: (e: IEvent) => void;
     onResponderGrant?: (e: IEvent) => void;
     onResponderReject?: (e: IEvent) => void;
     onResponderRelease?: (e: IEvent) => void;
 }
-declare type IProps = INegotiators & IResponders & IProcessors;
+declare type IProps = ICheckers & IResponders & IProcessors;
 declare type IEvent = TouchEvent;
 interface IResponderEventPlugin {
-    current: {
-        responder: (e: IEvent) => void;
-        eventType: string;
-        responderEvent: IDefinition;
+    view: {
+        dom: HTMLElement;
+        event: {
+            responder: ((e: IEvent) => void) | undefined;
+            type: string;
+        } | null;
         props: IProps;
-    };
-    extractEvents: (eventType: string, targetInst: IProps, nativeEvent: IEvent, nativeEventTarget: HTMLElement) => {
+    } | null;
+    extractEvents: (eventType: string, targetInst: IProps, nativeEvent: Event, nativeEventTarget: HTMLElement) => {
         nativeEvent: IEvent;
     };
     eventTypes: any;
@@ -50,9 +39,12 @@ export declare const ResponderTouchHistoryStore: {
         numberActiveTouches: number;
     };
 };
-export declare const injectEventPluginsByName: (injectedPlugins: any) => void;
+interface IPlugins {
+    ResponderEventPlugin?: IResponderEventPlugin;
+}
+export declare const injectEventPluginsByName: (injectedPlugins: IPlugins) => void;
 declare const _default: {
-    injectEventPluginsByName: (injectedPlugins: any) => void;
+    injectEventPluginsByName: (injectedPlugins: IPlugins) => void;
     ResponderEventPlugin: IResponderEventPlugin;
     ResponderTouchHistoryStore: {
         touchHistory: {
