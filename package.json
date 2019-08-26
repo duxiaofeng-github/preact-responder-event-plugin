@@ -4,15 +4,15 @@
   "description": "a library combine react-native-web and preact together",
   "license": "MIT",
   "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "module": "dist/index.js",
+  "types": "index.d.ts",
   "source": "src/index.ts",
   "author": "johnny",
   "scripts": {
-    "dev": "microbundle watch --raw --external preact --format es --no-sourcemap",
-    "clean": "rm -rf dist mangle.json",
+    "dev": "microbundle watch --raw --external preact --format es && microbundle watch --raw --external preact --format es --output src --no-compress",
+    "clean": "rm -rf dist src/index.js index.d.ts mangle.json",
     "update-mangle": "wget https://raw.githubusercontent.com/preactjs/preact/master/mangle.json",
-    "build": "yarn clean && yarn update-mangle && microbundle build --raw --external preact --format es --no-sourcemap",
+    "build": "yarn clean && yarn update-mangle && microbundle build --raw --external preact --format es && microbundle build --raw --external preact --format es --output src/index.js --no-compress --no-sourcemap && mv src/index.d.ts ./ && rm dist/index.d.ts",
     "pub": "npm version patch && npm publish"
   },
   "peerDependencies": {
