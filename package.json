@@ -19,7 +19,7 @@
     "preact": "^10.0.0-rc.1"
   },
   "devDependencies": {
+    "@types/react-native": "^0.60.8",
     "microbundle": "^0.11.0"
-  },
-  "dependencies": {}
+  }
 }

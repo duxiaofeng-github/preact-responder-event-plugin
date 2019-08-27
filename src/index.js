@@ -151,7 +151,7 @@ function getCheckers(eventType, eventPath, eventPathReverse) {
 }
 
 function getEventPaths(e) {
-  var eventPath = e.composedPath != null ? e.composedPath() : getEventPath(e);
+  var eventPath = e.path || (e.composedPath != null ? e.composedPath() : getEventPath(e));
   var eventPathReverse = eventPath.concat([]).reverse();
   return {
     eventPath: eventPath,
@@ -208,7 +208,7 @@ function handleResponderTransferRequest(e, definition, props, dom) {
 }
 
 function handleActiveTouches(e) {
-  ResponderTouchHistoryStore.touchHistory.numberActiveTouches = e.touches.length;
+  ResponderTouchHistoryStore.touchHistory.numberActiveTouches = e.nativeEvent.touches.length;
 }
 
 function isStartish(definition) {
@@ -316,17 +316,19 @@ function eventListener(e) {
   }
 
   var nativeEvent = result.nativeEvent;
-  var ref = getEventPaths(nativeEvent);
+  e.nativeEvent = nativeEvent;
+  var ref = getEventPaths(e);
   var eventPath = ref.eventPath;
   var eventPathReverse = ref.eventPathReverse;
-  var checkers = getCheckers(nativeEvent.type, eventPath, eventPathReverse);
-  executeResponder(nativeEvent, checkers);
+  var checkers = getCheckers(e.type, eventPath, eventPathReverse);
+  executeResponder(e, checkers);
 }
 
 var ResponderEventPlugin = {
   view: null,
   extractEvents: function (eventType, props, nativeEvent, nativeEventTarget) {
     return {
+      // event will transform to NativeTouchEvent by react-native-web
       nativeEvent: nativeEvent
     };
   },

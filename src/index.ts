@@ -1,4 +1,5 @@
 import { VNode, options } from "preact";
+import { NativeTouchEvent } from "react-native";
 
 let root: VNode;
 
@@ -140,7 +141,9 @@ interface ICheckerWrapper {
   dom: HTMLElement;
 }
 
-type IEvent = TouchEvent;
+interface IEvent extends UIEvent {
+  nativeEvent: NativeTouchEvent;
+}
 
 function getCheckersWithPropsByEventPath(checkerKey: string, eventPath: HTMLElement[], isCapture: boolean) {
   const checkers: ICheckerWrapper[] = [];
@@ -185,7 +188,7 @@ function getCheckers(eventType: string, eventPath: HTMLElement[], eventPathRever
 }
 
 function getEventPaths(e: IEvent) {
-  const eventPath = e.composedPath != null ? e.composedPath() : getEventPath(e);
+  const eventPath = (e as any).path || (e.composedPath != null ? e.composedPath() : getEventPath(e));
   const eventPathReverse = eventPath.concat([]).reverse();
   return { eventPath, eventPathReverse };
 }
@@ -240,7 +243,7 @@ function handleResponderTransferRequest(e: IEvent, definition: IDefinition, prop
 }
 
 function handleActiveTouches(e: IEvent) {
-  ResponderTouchHistoryStore.touchHistory.numberActiveTouches = e.touches.length;
+  ResponderTouchHistoryStore.touchHistory.numberActiveTouches = e.nativeEvent.touches.length;
 }
 
 function isStartish(definition: IDefinition) {
@@ -346,10 +349,12 @@ function eventListener(e: Event) {
 
   const { nativeEvent } = result;
 
-  const { eventPath, eventPathReverse } = getEventPaths(nativeEvent);
-  const checkers = getCheckers(nativeEvent.type, eventPath as HTMLElement[], eventPathReverse as HTMLElement[]);
+  (e as IEvent).nativeEvent = nativeEvent;
 
-  executeResponder(nativeEvent, checkers);
+  const { eventPath, eventPathReverse } = getEventPaths(e as IEvent);
+  const checkers = getCheckers(e.type, eventPath as HTMLElement[], eventPathReverse as HTMLElement[]);
+
+  executeResponder(e as IEvent, checkers);
 }
 
 interface IResponderEventPlugin {
@@ -366,7 +371,7 @@ interface IResponderEventPlugin {
     targetInst: IProps,
     nativeEvent: Event,
     nativeEventTarget: HTMLElement
-  ) => { nativeEvent: IEvent };
+  ) => { nativeEvent: NativeTouchEvent };
   eventTypes: any;
 }
 
@@ -374,7 +379,8 @@ export const ResponderEventPlugin: IResponderEventPlugin = {
   view: null,
   extractEvents: (eventType: string, props: IProps, nativeEvent: Event, nativeEventTarget: HTMLElement) => {
     return {
-      nativeEvent: nativeEvent as IEvent,
+      // event will transform to NativeTouchEvent by react-native-web
+      nativeEvent: (nativeEvent as any) as NativeTouchEvent,
     };
   },
   eventTypes: {

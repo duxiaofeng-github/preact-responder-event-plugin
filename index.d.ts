@@ -1,3 +1,4 @@
+import { NativeTouchEvent } from "react-native";
 declare type IChecker = (e: IEvent) => boolean;
 interface ICheckers {
     onMoveShouldSetResponderCapture?: IChecker;
@@ -18,7 +19,9 @@ interface IProcessors {
     onResponderRelease?: (e: IEvent) => void;
 }
 declare type IProps = ICheckers & IResponders & IProcessors;
-declare type IEvent = TouchEvent;
+interface IEvent extends UIEvent {
+    nativeEvent: NativeTouchEvent;
+}
 interface IResponderEventPlugin {
     view: {
         dom: HTMLElement;
@@ -29,7 +32,7 @@ interface IResponderEventPlugin {
         props: IProps;
     } | null;
     extractEvents: (eventType: string, targetInst: IProps, nativeEvent: Event, nativeEventTarget: HTMLElement) => {
-        nativeEvent: IEvent;
+        nativeEvent: NativeTouchEvent;
     };
     eventTypes: any;
 }
