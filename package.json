@@ -10,8 +10,8 @@
   "author": "johnny",
   "scripts": {
     "dev": "microbundle watch --raw --external preact --format es && microbundle watch --raw --external preact --format es --output src --no-compress",
-    "clean": "rm -rf dist src/index.js index.d.ts mangle.json",
-    "update-mangle": "wget https://raw.githubusercontent.com/preactjs/preact/master/mangle.json",
+    "clean": "rm -rf dist src/index.js index.d.ts",
+    "update-mangle": "rm -rf mangle.json && node mangle/index.js",
     "build": "yarn clean && yarn update-mangle && microbundle build --raw --external preact --format es && microbundle build --raw --external preact --format es --output src/index.js --no-compress --no-sourcemap && mv src/index.d.ts ./ && rm dist/index.d.ts",
     "pub": "npm version patch && npm publish"
   },
@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "@types/react-native": "^0.60.8",
+    "axios": "^0.19.0",
     "microbundle": "^0.11.0"
   }
 }

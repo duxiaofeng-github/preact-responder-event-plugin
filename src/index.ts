@@ -59,9 +59,9 @@ const moveDefinition = getEventDefinition(moveCheckerKeys, moveResponderKey, Pro
 const endDefinition = getEventDefinition([], endResponderKey, ProcessType.end);
 
 interface IDefinition {
-  checkerKeys: string[];
-  responderKey: string;
-  process: ProcessType;
+  _checkerKeys: string[];
+  _responderKey: string;
+  _process: ProcessType;
 }
 
 interface IResponderEvents {
@@ -77,8 +77,8 @@ const responderEvents: IResponderEvents = {
   mouseup: endDefinition,
 };
 
-function getEventDefinition(checkerKeys: string[], responderKey: string, process: ProcessType) {
-  return { checkerKeys, responderKey, process };
+function getEventDefinition(_checkerKeys: string[], _responderKey: string, _process: ProcessType) {
+  return { _checkerKeys, _responderKey, _process };
 }
 
 function addEventListenerToDocument() {
@@ -136,10 +136,10 @@ interface IProcessors {
 type IProps = ICheckers & IResponders & IProcessors;
 
 interface ICheckerWrapper {
-  isCapture: boolean;
-  checker: IChecker;
-  props: IProps;
-  dom: HTMLElement;
+  _isCapture: boolean;
+  _checker: IChecker;
+  _props: IProps;
+  _dom: HTMLElement;
 }
 
 interface IEvent extends UIEvent {
@@ -158,10 +158,10 @@ function getCheckersWithPropsByEventPath(checkerKey: string, eventPath: HTMLElem
 
         if (checker != null) {
           checkers.push({
-            isCapture,
-            checker,
-            props: vnode.props as IProps,
-            dom,
+            _isCapture: isCapture,
+            _checker: checker,
+            _props: vnode.props as IProps,
+            _dom: dom,
           });
         }
       }
@@ -173,7 +173,7 @@ function getCheckersWithPropsByEventPath(checkerKey: string, eventPath: HTMLElem
 
 function getCheckers(eventType: string, eventPath: HTMLElement[], eventPathReverse: HTMLElement[]) {
   const definition = responderEvents[eventType];
-  const checkerKeys = definition.checkerKeys;
+  const checkerKeys = definition._checkerKeys;
   const checkers: ICheckerWrapper[] = [];
 
   for (let key of checkerKeys) {
@@ -199,10 +199,10 @@ function setEvent(e: IEvent, responderKey: keyof IProps, props: IProps) {
   const responder = props[responderKey];
   const plugin = getPlugin();
 
-  if (plugin!.view) {
-    plugin!.view!.event = {
-      responder,
-      type: e.type,
+  if (plugin!._view) {
+    plugin!._view!._event = {
+      _responder: responder,
+      _type: e.type,
     };
   }
 }
@@ -211,13 +211,13 @@ function initView(e: IEvent, responderKey: keyof IProps, props: IProps, dom: HTM
   const responder = props[responderKey];
   const plugin = getPlugin();
 
-  plugin!.view = {
-    event: {
-      responder,
-      type: e.type,
+  plugin!._view = {
+    _event: {
+      _responder: responder,
+      _type: e.type,
     },
-    props,
-    dom,
+    _props: props,
+    _dom: dom,
   };
 
   const { onResponderGrant } = props;
@@ -228,20 +228,20 @@ function initView(e: IEvent, responderKey: keyof IProps, props: IProps, dom: HTM
 function handleResponderTransferRequest(e: IEvent, definition: IDefinition, props: IProps, dom: HTMLElement) {
   const view = getCurrentView();
   // view can't be null here
-  const { onResponderTerminate, onResponderTerminationRequest } = view!.props;
+  const { onResponderTerminate, onResponderTerminationRequest } = view!._props;
   const { onResponderReject } = props;
 
   if (onResponderTerminationRequest) {
     const allowTransfer = onResponderTerminationRequest(e);
 
     if (allowTransfer) {
-      initView(e, definition.responderKey as keyof IProps, props, dom);
+      initView(e, definition._responderKey as keyof IProps, props, dom);
       if (onResponderTerminate) onResponderTerminate(e);
     } else {
       if (onResponderReject) onResponderReject(e);
     }
   } else {
-    initView(e, definition.responderKey as keyof IProps, props, dom);
+    initView(e, definition._responderKey as keyof IProps, props, dom);
     if (onResponderTerminate) onResponderTerminate(e);
   }
 }
@@ -251,15 +251,15 @@ function handleActiveTouches(e: IEvent) {
 }
 
 function isStartish(definition: IDefinition) {
-  return definition.process === ProcessType.start;
+  return definition._process === ProcessType.start;
 }
 
 function isMoveish(definition: IDefinition) {
-  return definition.process === ProcessType.move;
+  return definition._process === ProcessType.move;
 }
 
 function isEndish(definition: IDefinition) {
-  return definition.process === ProcessType.end;
+  return definition._process === ProcessType.end;
 }
 
 function getPlugin() {
@@ -269,21 +269,21 @@ function getPlugin() {
 function getCurrentView() {
   const plugin = getPlugin();
   if (plugin) {
-    return plugin.view;
+    return plugin._view;
   }
 }
 
 function getCurrentEvent() {
   const view = getCurrentView();
   if (view) {
-    return view.event;
+    return view._event;
   }
 }
 
 function getCurrentResponder() {
   const event = getCurrentEvent();
   if (event) {
-    return event.responder;
+    return event._responder;
   }
 }
 
@@ -294,23 +294,23 @@ function executeResponder(e: IEvent, checker: ICheckerWrapper[]) {
 
   if (isStartish(definition) || isMoveish(definition)) {
     for (let item of checker) {
-      e = { ...e, bubbles: !item.isCapture };
+      e = { ...e, bubbles: !item._isCapture };
 
-      const requireToBeResponder = item.checker(e);
+      const requireToBeResponder = item._checker(e);
 
       if (requireToBeResponder) {
         const view = getCurrentView();
 
         // if no responding view, set it and call granted
         if (view == null) {
-          initView(e, definition.responderKey as keyof IProps, item.props, item.dom);
+          initView(e, definition._responderKey as keyof IProps, item._props, item._dom);
         } else {
           // if same view is responding, set new responder
-          if (view.dom === item.dom) {
-            setEvent(e, definition.responderKey as keyof IProps, item.props);
+          if (view._dom === item._dom) {
+            setEvent(e, definition._responderKey as keyof IProps, item._props);
           } else {
             // if other view wants to response, start to negotiate
-            handleResponderTransferRequest(e, definition, item.props, item.dom);
+            handleResponderTransferRequest(e, definition, item._props, item._dom);
           }
         }
 
@@ -322,7 +322,7 @@ function executeResponder(e: IEvent, checker: ICheckerWrapper[]) {
 
     if (responder) {
       responder(e);
-      getPlugin()!.view!.event = null;
+      getPlugin()!._view!._event = null;
     }
   }
 
@@ -330,7 +330,7 @@ function executeResponder(e: IEvent, checker: ICheckerWrapper[]) {
     const view = getCurrentView();
 
     if (view != null) {
-      const { onResponderRelease, onResponderEnd } = view.props;
+      const { onResponderRelease, onResponderEnd } = view._props;
 
       if (onResponderEnd) {
         onResponderEnd(e);
@@ -344,7 +344,7 @@ function executeResponder(e: IEvent, checker: ICheckerWrapper[]) {
         const plugin = getPlugin();
 
         if (plugin) {
-          plugin.view = null;
+          plugin._view = null;
         }
       }
     }
@@ -371,13 +371,13 @@ function eventListener(e: Event) {
 }
 
 interface IResponderEventPlugin {
-  view: {
-    dom: HTMLElement;
-    event: {
-      responder: ((e: IEvent) => void) | undefined;
-      type: string;
+  _view: {
+    _dom: HTMLElement;
+    _event: {
+      _responder: ((e: IEvent) => void) | undefined;
+      _type: string;
     } | null;
-    props: IProps;
+    _props: IProps;
   } | null;
   extractEvents: (
     eventType: string,
@@ -389,7 +389,7 @@ interface IResponderEventPlugin {
 }
 
 export const ResponderEventPlugin: IResponderEventPlugin = {
-  view: null,
+  _view: null,
   extractEvents: (eventType: string, props: IProps, nativeEvent: Event, nativeEventTarget: HTMLElement) => {
     return {
       // event will transform to NativeTouchEvent by react-native-web
