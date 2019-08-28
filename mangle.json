@@ -23,7 +23,7 @@
       "$_renderCallbacks": "__h",
       "$_vnode": "__v",
       "$_children": "__k",
-      "$_dom": "_d",
+      "$_dom": "__e",
       "$_component": "__c",
       "$__html": "__html",
       "$_parent": "__p",
@@ -40,16 +40,17 @@
       "$_hook": "__h",
       "$_catchError": "__e",
       "$_unmount": "_e",
-      "$_checkerKeys": "_ck",
-      "$_responderKey": "_rk",
-      "$_process": "_p",
-      "$_view": "_v",
-      "$_event": "_e",
-      "$_responder": "_r",
-      "$_type": "_t",
-      "$_props": "_p",
-      "$_isCapture": "_ic",
-      "$_checker": "_c"
+      "$prepCheckerKeys": "_ck",
+      "$prepResponderKey": "_rk",
+      "$prepProcess": "_p",
+      "$prepView": "_v",
+      "$prepEvent": "_e",
+      "$prepResponder": "_r",
+      "$prepType": "_t",
+      "$prepProps": "_p",
+      "$prepIsCapture": "_ic",
+      "$prepChecker": "_c",
+      "$prepDom": "_d"
     }
   }
 }

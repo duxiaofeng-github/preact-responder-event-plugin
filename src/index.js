@@ -68,11 +68,11 @@ var responderEvents = {
   mouseup: endDefinition
 };
 
-function getEventDefinition(_checkerKeys, _responderKey, _process) {
+function getEventDefinition(prepCheckerKeys, prepResponderKey, prepProcess) {
   return {
-    _checkerKeys: _checkerKeys,
-    _responderKey: _responderKey,
-    _process: _process
+    prepCheckerKeys: prepCheckerKeys,
+    prepResponderKey: prepResponderKey,
+    prepProcess: prepProcess
   };
 }
 
@@ -119,10 +119,10 @@ function getCheckersWithPropsByEventPath(checkerKey, eventPath, isCapture) {
 
         if (checker != null) {
           checkers.push({
-            _isCapture: isCapture,
-            _checker: checker,
-            _props: vnode.props,
-            _dom: dom
+            prepIsCapture: isCapture,
+            prepChecker: checker,
+            prepProps: vnode.props,
+            prepDom: dom
           });
         }
       }
@@ -134,7 +134,7 @@ function getCheckersWithPropsByEventPath(checkerKey, eventPath, isCapture) {
 
 function getCheckers(eventType, eventPath, eventPathReverse) {
   var definition = responderEvents[eventType];
-  var checkerKeys = definition._checkerKeys;
+  var checkerKeys = definition.prepCheckerKeys;
   var checkers = [];
 
   for (var i = 0, list = checkerKeys; i < list.length; i += 1) {
@@ -165,10 +165,10 @@ function setEvent(e, responderKey, props) {
   var responder = props[responderKey];
   var plugin = getPlugin();
 
-  if (plugin._view) {
-    plugin._view._event = {
-      _responder: responder,
-      _type: e.type
+  if (plugin.prepView) {
+    plugin.prepView.prepEvent = {
+      prepResponder: responder,
+      prepType: e.type
     };
   }
 }
@@ -176,13 +176,13 @@ function setEvent(e, responderKey, props) {
 function initView(e, responderKey, props, dom) {
   var responder = props[responderKey];
   var plugin = getPlugin();
-  plugin._view = {
-    _event: {
-      _responder: responder,
-      _type: e.type
+  plugin.prepView = {
+    prepEvent: {
+      prepResponder: responder,
+      prepType: e.type
     },
-    _props: props,
-    _dom: dom
+    prepProps: props,
+    prepDom: dom
   };
   var onResponderGrant = props.onResponderGrant;
   if (onResponderGrant) { onResponderGrant(e); }
@@ -191,7 +191,7 @@ function initView(e, responderKey, props, dom) {
 function handleResponderTransferRequest(e, definition, props, dom) {
   var view = getCurrentView(); // view can't be null here
 
-  var ref = view._props;
+  var ref = view.prepProps;
   var onResponderTerminate = ref.onResponderTerminate;
   var onResponderTerminationRequest = ref.onResponderTerminationRequest;
   var onResponderReject = props.onResponderReject;
@@ -200,13 +200,13 @@ function handleResponderTransferRequest(e, definition, props, dom) {
     var allowTransfer = onResponderTerminationRequest(e);
 
     if (allowTransfer) {
-      initView(e, definition._responderKey, props, dom);
+      initView(e, definition.prepResponderKey, props, dom);
       if (onResponderTerminate) { onResponderTerminate(e); }
     } else {
       if (onResponderReject) { onResponderReject(e); }
     }
   } else {
-    initView(e, definition._responderKey, props, dom);
+    initView(e, definition.prepResponderKey, props, dom);
     if (onResponderTerminate) { onResponderTerminate(e); }
   }
 }
@@ -216,15 +216,15 @@ function handleActiveTouches(e) {
 }
 
 function isStartish(definition) {
-  return definition._process === ProcessType.start;
+  return definition.prepProcess === ProcessType.start;
 }
 
 function isMoveish(definition) {
-  return definition._process === ProcessType.move;
+  return definition.prepProcess === ProcessType.move;
 }
 
 function isEndish(definition) {
-  return definition._process === ProcessType.end;
+  return definition.prepProcess === ProcessType.end;
 }
 
 function getPlugin() {
@@ -235,7 +235,7 @@ function getCurrentView() {
   var plugin = getPlugin();
 
   if (plugin) {
-    return plugin._view;
+    return plugin.prepView;
   }
 }
 
@@ -243,7 +243,7 @@ function getCurrentEvent() {
   var view = getCurrentView();
 
   if (view) {
-    return view._event;
+    return view.prepEvent;
   }
 }
 
@@ -251,7 +251,7 @@ function getCurrentResponder() {
   var event = getCurrentEvent();
 
   if (event) {
-    return event._responder;
+    return event.prepResponder;
   }
 }
 
@@ -264,22 +264,21 @@ function executeResponder(e, checker) {
       var item = list[i];
 
       e = Object.assign({}, e,
-        {bubbles: !item._isCapture});
-
-      var requireToBeResponder = item._checker(e);
+        {bubbles: !item.prepIsCapture});
+      var requireToBeResponder = item.prepChecker(e);
 
       if (requireToBeResponder) {
         var view = getCurrentView(); // if no responding view, set it and call granted
 
         if (view == null) {
-          initView(e, definition._responderKey, item._props, item._dom);
+          initView(e, definition.prepResponderKey, item.prepProps, item.prepDom);
         } else {
           // if same view is responding, set new responder
-          if (view._dom === item._dom) {
-            setEvent(e, definition._responderKey, item._props);
+          if (view.prepDom === item.prepDom) {
+            setEvent(e, definition.prepResponderKey, item.prepProps);
           } else {
             // if other view wants to response, start to negotiate
-            handleResponderTransferRequest(e, definition, item._props, item._dom);
+            handleResponderTransferRequest(e, definition, item.prepProps, item.prepDom);
           }
         }
 
@@ -291,7 +290,7 @@ function executeResponder(e, checker) {
 
     if (responder) {
       responder(e);
-      getPlugin()._view._event = null;
+      getPlugin().prepView.prepEvent = null;
     }
   }
 
@@ -299,7 +298,7 @@ function executeResponder(e, checker) {
     var view$1 = getCurrentView();
 
     if (view$1 != null) {
-      var ref = view$1._props;
+      var ref = view$1.prepProps;
       var onResponderRelease = ref.onResponderRelease;
       var onResponderEnd = ref.onResponderEnd;
 
@@ -315,7 +314,7 @@ function executeResponder(e, checker) {
         var plugin = getPlugin();
 
         if (plugin) {
-          plugin._view = null;
+          plugin.prepView = null;
         }
       }
     }
@@ -340,7 +339,7 @@ function eventListener(e) {
 }
 
 var ResponderEventPlugin = {
-  _view: null,
+  prepView: null,
   extractEvents: function (eventType, props, nativeEvent, nativeEventTarget) {
     return {
       // event will transform to NativeTouchEvent by react-native-web

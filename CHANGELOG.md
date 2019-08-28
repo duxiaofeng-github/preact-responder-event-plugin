@@ -1,3 +1,7 @@
+# 1.0.8
+
+- fix mangle properties
+
 # 1.0.7
 
 - add change log

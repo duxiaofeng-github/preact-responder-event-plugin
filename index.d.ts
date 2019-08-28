@@ -23,13 +23,13 @@ interface IEvent extends UIEvent {
     nativeEvent: NativeTouchEvent;
 }
 interface IResponderEventPlugin {
-    _view: {
-        _dom: HTMLElement;
-        _event: {
-            _responder: ((e: IEvent) => void) | undefined;
-            _type: string;
+    prepView: {
+        prepDom: HTMLElement;
+        prepEvent: {
+            prepResponder: ((e: IEvent) => void) | undefined;
+            prepType: string;
         } | null;
-        _props: IProps;
+        prepProps: IProps;
     } | null;
     extractEvents: (eventType: string, targetInst: IProps, nativeEvent: Event, nativeEventTarget: HTMLElement) => {
         nativeEvent: NativeTouchEvent;
