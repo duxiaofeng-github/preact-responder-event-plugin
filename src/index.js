@@ -18,7 +18,7 @@ options._root = function (node) {
 var oldCommitHook = options._commit;
 
 options._commit = function (node) {
-  if (root && plugins.ResponderEventPlugin) {
+  if (root && getPlugin()) {
     var vnodes = [root];
 
     while (vnodes.length) {
@@ -68,11 +68,11 @@ var responderEvents = {
   mouseup: endDefinition
 };
 
-function getEventDefinition(checkerKeys, responderKey, process) {
+function getEventDefinition(_checkerKeys, _responderKey, _process) {
   return {
-    checkerKeys: checkerKeys,
-    responderKey: responderKey,
-    process: process
+    _checkerKeys: _checkerKeys,
+    _responderKey: _responderKey,
+    _process: _process
   };
 }
 
@@ -94,10 +94,11 @@ function getEventPath(e) {
 
   while (parent.length) {
     var ele = parent.pop();
+    var parentElement = ele.parentElement;
 
-    if (ele.parentElement) {
-      parent.push(ele.parentElement);
-      path.push(ele.parentElement);
+    if (parentElement) {
+      parent.push(parentElement);
+      path.push(parentElement);
     }
   }
 
@@ -118,10 +119,10 @@ function getCheckersWithPropsByEventPath(checkerKey, eventPath, isCapture) {
 
         if (checker != null) {
           checkers.push({
-            isCapture: isCapture,
-            checker: checker,
-            props: vnode.props,
-            dom: dom
+            _isCapture: isCapture,
+            _checker: checker,
+            _props: vnode.props,
+            _dom: dom
           });
         }
       }
@@ -133,7 +134,7 @@ function getCheckersWithPropsByEventPath(checkerKey, eventPath, isCapture) {
 
 function getCheckers(eventType, eventPath, eventPathReverse) {
   var definition = responderEvents[eventType];
-  var checkerKeys = definition.checkerKeys;
+  var checkerKeys = definition._checkerKeys;
   var checkers = [];
 
   for (var i = 0, list = checkerKeys; i < list.length; i += 1) {
@@ -151,34 +152,37 @@ function getCheckers(eventType, eventPath, eventPathReverse) {
 }
 
 function getEventPaths(e) {
-  var eventPath = e.path || (e.composedPath != null ? e.composedPath() : getEventPath(e));
-  var eventPathReverse = eventPath.concat([]).reverse();
+  var composedPath = e.composedPath;
+  var path = e.path || (composedPath != null ? composedPath() : getEventPath(e));
+  var pathReverse = path.concat([]).reverse();
   return {
-    eventPath: eventPath,
-    eventPathReverse: eventPathReverse
+    p: path,
+    pr: pathReverse
   };
 }
 
 function setEvent(e, responderKey, props) {
   var responder = props[responderKey];
+  var plugin = getPlugin();
 
-  if (plugins.ResponderEventPlugin.view) {
-    plugins.ResponderEventPlugin.view.event = {
-      responder: responder,
-      type: e.type
+  if (plugin._view) {
+    plugin._view._event = {
+      _responder: responder,
+      _type: e.type
     };
   }
 }
 
 function initView(e, responderKey, props, dom) {
   var responder = props[responderKey];
-  plugins.ResponderEventPlugin.view = {
-    event: {
-      responder: responder,
-      type: e.type
+  var plugin = getPlugin();
+  plugin._view = {
+    _event: {
+      _responder: responder,
+      _type: e.type
     },
-    props: props,
-    dom: dom
+    _props: props,
+    _dom: dom
   };
   var onResponderGrant = props.onResponderGrant;
   if (onResponderGrant) { onResponderGrant(e); }
@@ -187,7 +191,7 @@ function initView(e, responderKey, props, dom) {
 function handleResponderTransferRequest(e, definition, props, dom) {
   var view = getCurrentView(); // view can't be null here
 
-  var ref = view.props;
+  var ref = view._props;
   var onResponderTerminate = ref.onResponderTerminate;
   var onResponderTerminationRequest = ref.onResponderTerminationRequest;
   var onResponderReject = props.onResponderReject;
@@ -196,13 +200,13 @@ function handleResponderTransferRequest(e, definition, props, dom) {
     var allowTransfer = onResponderTerminationRequest(e);
 
     if (allowTransfer) {
-      initView(e, definition.responderKey, props, dom);
+      initView(e, definition._responderKey, props, dom);
       if (onResponderTerminate) { onResponderTerminate(e); }
     } else {
       if (onResponderReject) { onResponderReject(e); }
     }
   } else {
-    initView(e, definition.responderKey, props, dom);
+    initView(e, definition._responderKey, props, dom);
     if (onResponderTerminate) { onResponderTerminate(e); }
   }
 }
@@ -212,20 +216,26 @@ function handleActiveTouches(e) {
 }
 
 function isStartish(definition) {
-  return definition.process === ProcessType.start;
+  return definition._process === ProcessType.start;
 }
 
 function isMoveish(definition) {
-  return definition.process === ProcessType.move;
+  return definition._process === ProcessType.move;
 }
 
 function isEndish(definition) {
-  return definition.process === ProcessType.end;
+  return definition._process === ProcessType.end;
+}
+
+function getPlugin() {
+  return plugins.ResponderEventPlugin;
 }
 
 function getCurrentView() {
-  if (plugins.ResponderEventPlugin) {
-    return plugins.ResponderEventPlugin.view;
+  var plugin = getPlugin();
+
+  if (plugin) {
+    return plugin._view;
   }
 }
 
@@ -233,7 +243,7 @@ function getCurrentEvent() {
   var view = getCurrentView();
 
   if (view) {
-    return view.event;
+    return view._event;
   }
 }
 
@@ -241,7 +251,7 @@ function getCurrentResponder() {
   var event = getCurrentEvent();
 
   if (event) {
-    return event.responder;
+    return event._responder;
   }
 }
 
@@ -254,23 +264,26 @@ function executeResponder(e, checker) {
       var item = list[i];
 
       e = Object.assign({}, e,
-        {bubbles: !item.isCapture});
-      var requireToBeResponder = item.checker(e);
+        {bubbles: !item._isCapture});
+
+      var requireToBeResponder = item._checker(e);
 
       if (requireToBeResponder) {
         var view = getCurrentView(); // if no responding view, set it and call granted
 
         if (view == null) {
-          initView(e, definition.responderKey, item.props, item.dom);
+          initView(e, definition._responderKey, item._props, item._dom);
         } else {
           // if same view is responding, set new responder
-          if (view.dom === item.dom) {
-            setEvent(e, definition.responderKey, item.props);
+          if (view._dom === item._dom) {
+            setEvent(e, definition._responderKey, item._props);
           } else {
             // if other view wants to response, start to negotiate
-            handleResponderTransferRequest(e, definition, item.props, item.dom);
+            handleResponderTransferRequest(e, definition, item._props, item._dom);
           }
         }
+
+        break;
       }
     }
 
@@ -278,7 +291,7 @@ function executeResponder(e, checker) {
 
     if (responder) {
       responder(e);
-      plugins.ResponderEventPlugin.view.event = null;
+      getPlugin()._view._event = null;
     }
   }
 
@@ -286,7 +299,7 @@ function executeResponder(e, checker) {
     var view$1 = getCurrentView();
 
     if (view$1 != null) {
-      var ref = view$1.props;
+      var ref = view$1._props;
       var onResponderRelease = ref.onResponderRelease;
       var onResponderEnd = ref.onResponderEnd;
 
@@ -299,8 +312,10 @@ function executeResponder(e, checker) {
           onResponderRelease(e);
         }
 
-        if (plugins.ResponderEventPlugin) {
-          plugins.ResponderEventPlugin.view = null;
+        var plugin = getPlugin();
+
+        if (plugin) {
+          plugin._view = null;
         }
       }
     }
@@ -308,24 +323,24 @@ function executeResponder(e, checker) {
 }
 
 function eventListener(e) {
-  if (!plugins.ResponderEventPlugin) { return; }
-  var result = plugins.ResponderEventPlugin.extractEvents(e.type, {}, e, e.target);
+  var plugin = getPlugin();
+  if (!plugin) { return; }
+  var result = plugin.extractEvents(e.type, {}, e, e.target);
 
   if (result == null) {
     return;
   }
 
-  var nativeEvent = result.nativeEvent;
-  e.nativeEvent = nativeEvent;
+  e.nativeEvent = result.nativeEvent;
   var ref = getEventPaths(e);
-  var eventPath = ref.eventPath;
-  var eventPathReverse = ref.eventPathReverse;
-  var checkers = getCheckers(e.type, eventPath, eventPathReverse);
+  var p = ref.p;
+  var pr = ref.pr;
+  var checkers = getCheckers(e.type, p, pr);
   executeResponder(e, checkers);
 }
 
 var ResponderEventPlugin = {
-  view: null,
+  _view: null,
   extractEvents: function (eventType, props, nativeEvent, nativeEventTarget) {
     return {
       // event will transform to NativeTouchEvent by react-native-web
