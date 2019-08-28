@@ -134,6 +134,10 @@ to return true:wantsResponderID|                            |
                                +                            +
 ```
 
+# CHANGELOG
+
+[CHANGELOG](./CHANGELOG.md)
+
 # LICENSE
 
 MIT
