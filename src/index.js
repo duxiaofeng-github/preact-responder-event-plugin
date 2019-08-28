@@ -119,7 +119,6 @@ function getCheckersWithPropsByEventPath(checkerKey, eventPath, isCapture) {
 
         if (checker != null) {
           checkers.push({
-            prepIsCapture: isCapture,
             prepChecker: checker,
             prepProps: vnode.props,
             prepDom: dom
@@ -263,8 +262,6 @@ function executeResponder(e, checker) {
     for (var i = 0, list = checker; i < list.length; i += 1) {
       var item = list[i];
 
-      e = Object.assign({}, e,
-        {bubbles: !item.prepIsCapture});
       var requireToBeResponder = item.prepChecker(e);
 
       if (requireToBeResponder) {

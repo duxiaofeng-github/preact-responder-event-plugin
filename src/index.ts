@@ -136,7 +136,6 @@ interface IProcessors {
 type IProps = ICheckers & IResponders & IProcessors;
 
 interface ICheckerWrapper {
-  prepIsCapture: boolean;
   prepChecker: IChecker;
   prepProps: IProps;
   prepDom: HTMLElement;
@@ -158,7 +157,6 @@ function getCheckersWithPropsByEventPath(checkerKey: string, eventPath: HTMLElem
 
         if (checker != null) {
           checkers.push({
-            prepIsCapture: isCapture,
             prepChecker: checker,
             prepProps: vnode.props as IProps,
             prepDom: dom,
@@ -294,8 +292,6 @@ function executeResponder(e: IEvent, checker: ICheckerWrapper[]) {
 
   if (isStartish(definition) || isMoveish(definition)) {
     for (let item of checker) {
-      e = { ...e, bubbles: !item.prepIsCapture };
-
       const requireToBeResponder = item.prepChecker(e);
 
       if (requireToBeResponder) {

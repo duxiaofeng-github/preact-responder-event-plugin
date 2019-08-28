@@ -1,5 +1,9 @@
 # 1.0.8
 
+- fix event which is passed to responder
+
+# 1.0.8
+
 - fix mangle properties
 
 # 1.0.7
