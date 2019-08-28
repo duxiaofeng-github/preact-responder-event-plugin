@@ -20,7 +20,7 @@ const oldRootHook = (options as any)._root;
 let oldCommitHook = (options as any)._commit;
 
 (options as any)._commit = (node: VNode) => {
-  if (root && plugins.ResponderEventPlugin) {
+  if (root && getPlugin()) {
     const vnodes = [root];
 
     while (vnodes.length) {
@@ -99,10 +99,11 @@ function getEventPath(e: IEvent) {
 
   while (parent.length) {
     const ele = parent.pop();
+    const parentElement = ele.parentElement;
 
-    if (ele.parentElement) {
-      parent.push(ele.parentElement);
-      path.push(ele.parentElement);
+    if (parentElement) {
+      parent.push(parentElement);
+      path.push(parentElement);
     }
   }
 
@@ -188,16 +189,18 @@ function getCheckers(eventType: string, eventPath: HTMLElement[], eventPathRever
 }
 
 function getEventPaths(e: IEvent) {
-  const eventPath = (e as any).path || (e.composedPath != null ? e.composedPath() : getEventPath(e));
-  const eventPathReverse = eventPath.concat([]).reverse();
-  return { eventPath, eventPathReverse };
+  const composedPath = e.composedPath;
+  const path = (e as any).path || (composedPath != null ? composedPath() : getEventPath(e));
+  const pathReverse = path.concat([]).reverse();
+  return { p: path, pr: pathReverse };
 }
 
 function setEvent(e: IEvent, responderKey: keyof IProps, props: IProps) {
   const responder = props[responderKey];
+  const plugin = getPlugin();
 
-  if (plugins.ResponderEventPlugin!.view) {
-    plugins.ResponderEventPlugin!.view!.event = {
+  if (plugin!.view) {
+    plugin!.view!.event = {
       responder,
       type: e.type,
     };
@@ -206,8 +209,9 @@ function setEvent(e: IEvent, responderKey: keyof IProps, props: IProps) {
 
 function initView(e: IEvent, responderKey: keyof IProps, props: IProps, dom: HTMLElement) {
   const responder = props[responderKey];
+  const plugin = getPlugin();
 
-  plugins.ResponderEventPlugin!.view = {
+  plugin!.view = {
     event: {
       responder,
       type: e.type,
@@ -258,9 +262,14 @@ function isEndish(definition: IDefinition) {
   return definition.process === ProcessType.end;
 }
 
+function getPlugin() {
+  return plugins.ResponderEventPlugin;
+}
+
 function getCurrentView() {
-  if (plugins.ResponderEventPlugin) {
-    return plugins.ResponderEventPlugin.view;
+  const plugin = getPlugin();
+  if (plugin) {
+    return plugin.view;
   }
 }
 
@@ -304,6 +313,8 @@ function executeResponder(e: IEvent, checker: ICheckerWrapper[]) {
             handleResponderTransferRequest(e, definition, item.props, item.dom);
           }
         }
+
+        break;
       }
     }
 
@@ -311,7 +322,7 @@ function executeResponder(e: IEvent, checker: ICheckerWrapper[]) {
 
     if (responder) {
       responder(e);
-      plugins.ResponderEventPlugin!.view!.event = null;
+      getPlugin()!.view!.event = null;
     }
   }
 
@@ -330,8 +341,10 @@ function executeResponder(e: IEvent, checker: ICheckerWrapper[]) {
           onResponderRelease(e);
         }
 
-        if (plugins.ResponderEventPlugin) {
-          plugins.ResponderEventPlugin.view = null;
+        const plugin = getPlugin();
+
+        if (plugin) {
+          plugin.view = null;
         }
       }
     }
@@ -339,20 +352,20 @@ function executeResponder(e: IEvent, checker: ICheckerWrapper[]) {
 }
 
 function eventListener(e: Event) {
-  if (!plugins.ResponderEventPlugin) return;
+  const plugin = getPlugin();
 
-  const result = plugins.ResponderEventPlugin.extractEvents(e.type, {}, e, e.target as HTMLElement);
+  if (!plugin) return;
+
+  const result = plugin.extractEvents(e.type, {}, e, e.target as HTMLElement);
 
   if (result == null) {
     return;
   }
 
-  const { nativeEvent } = result;
+  (e as IEvent).nativeEvent = result.nativeEvent;
 
-  (e as IEvent).nativeEvent = nativeEvent;
-
-  const { eventPath, eventPathReverse } = getEventPaths(e as IEvent);
-  const checkers = getCheckers(e.type, eventPath as HTMLElement[], eventPathReverse as HTMLElement[]);
+  const { p, pr } = getEventPaths(e as IEvent);
+  const checkers = getCheckers(e.type, p as HTMLElement[], pr as HTMLElement[]);
 
   executeResponder(e as IEvent, checkers);
 }
