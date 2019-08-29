@@ -25,7 +25,11 @@ options._commit = function (node) {
       var vnode = vnodes.pop(); // it's a real vnode reflect to the dom
 
       if (typeof vnode.type === "string") {
-        vnode._dom._vnode = vnode;
+        var dom = vnode._dom;
+
+        if (dom != null) {
+          dom._vnode = vnode;
+        }
       }
 
       if (vnode._children != null && vnode._children.length != null) {

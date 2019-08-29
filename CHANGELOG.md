@@ -1,3 +1,7 @@
+# 1.0.11
+
+- fix crash when preact is committing
+
 # 1.0.10
 
 - update readme and keywords

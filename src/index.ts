@@ -28,7 +28,11 @@ let oldCommitHook = (options as any)._commit;
 
       // it's a real vnode reflect to the dom
       if (typeof (vnode as any).type === "string") {
-        (vnode as any)._dom._vnode = vnode;
+        const dom = (vnode as any)._dom;
+
+        if (dom != null) {
+          dom._vnode = vnode;
+        }
       }
 
       if ((vnode as any)._children != null && (vnode as any)._children.length != null) {
