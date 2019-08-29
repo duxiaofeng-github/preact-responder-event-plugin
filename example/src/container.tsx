@@ -265,7 +265,7 @@ export class Container extends React.Component<IProps, IState> {
     if (type === NodeType.Parent) {
       const newState = parentShouldResponse
         ? `parent wants to response ${e.type}`
-        : `parent don't want to response ${e.type}`;
+        : `parent doesn't want to response ${e.type}`;
 
       this.setState((state) => {
         const parentStateText = this.getNewStateText(state.parentStateText, newState, e);
@@ -279,7 +279,7 @@ export class Container extends React.Component<IProps, IState> {
     } else if (type === NodeType.ChildOne) {
       const newState = childOneShouldResponse
         ? `child one wants to response ${e.type}`
-        : `child one don't want to response ${e.type}`;
+        : `child one doesn't want to response ${e.type}`;
 
       this.setState((state) => {
         const childOneStateText = this.getNewStateText(state.childOneStateText, newState, e);
@@ -291,7 +291,7 @@ export class Container extends React.Component<IProps, IState> {
     } else if (type === NodeType.ChildTwo) {
       const newState = childTwoShouldResponse
         ? `child two wants to response ${e.type}`
-        : `child two don't want to response ${e.type}`;
+        : `child two doesn't want to response ${e.type}`;
 
       this.setState((state) => {
         const childTwoStateText = this.getNewStateText(state.childTwoStateText, newState, e);
@@ -313,7 +313,7 @@ export class Container extends React.Component<IProps, IState> {
     if (type === NodeType.Parent) {
       const newState = parentShouldResponse
         ? `parent wants to response ${e.type} during capture`
-        : `parent don't want to response ${e.type} during capture`;
+        : `parent doesn't want to response ${e.type} during capture`;
 
       this.setState((state) => {
         const parentStateText = this.getNewStateText(state.parentStateText, newState, e);
@@ -324,7 +324,7 @@ export class Container extends React.Component<IProps, IState> {
     } else if (type === NodeType.ChildOne) {
       const newState = childOneShouldResponse
         ? `child one wants to response ${e.type} during capture`
-        : `child one don't want to response ${e.type} during capture`;
+        : `child one doesn't want to response ${e.type} during capture`;
 
       this.setState((state) => {
         const childOneStateText = this.getNewStateText(state.childOneStateText, newState, e);
@@ -335,7 +335,7 @@ export class Container extends React.Component<IProps, IState> {
     } else if (type === NodeType.ChildTwo) {
       const newState = childTwoShouldResponse
         ? `child two wants to response ${e.type} during capture`
-        : `child two don't want to response ${e.type} during capture`;
+        : `child two doesn't want to response ${e.type} during capture`;
 
       this.setState((state) => {
         const childTwoStateText = this.getNewStateText(state.childTwoStateText, newState, e);
@@ -356,7 +356,7 @@ export class Container extends React.Component<IProps, IState> {
     if (type === NodeType.Parent) {
       const newState = allowTerminationRequest
         ? `parent allow the termination request`
-        : `parent don't allow the termination request`;
+        : `parent doesn't allow the termination request`;
 
       this.setState((state) => {
         const parentStateText = this.getNewStateText(state.parentStateText, newState, e);
@@ -365,7 +365,7 @@ export class Container extends React.Component<IProps, IState> {
     } else if (type === NodeType.ChildOne) {
       const newState = allowTerminationRequest
         ? `child one allow the termination request`
-        : `child one don't allow the termination request`;
+        : `child one doesn't allow the termination request`;
 
       this.setState((state) => {
         const childOneStateText = this.getNewStateText(state.childOneStateText, newState, e);
@@ -374,7 +374,7 @@ export class Container extends React.Component<IProps, IState> {
     } else if (type === NodeType.ChildTwo) {
       const newState = allowTerminationRequest
         ? `child two allow the termination request`
-        : `child two don't allow the termination request`;
+        : `child two doesn't allow the termination request`;
 
       this.setState((state) => {
         const childTwoStateText = this.getNewStateText(state.childTwoStateText, newState, e);
@@ -579,21 +579,21 @@ export class Container extends React.Component<IProps, IState> {
     this.increaseNumber(e);
 
     if (type === NodeType.Parent) {
-      const newState = `parent responder have been released`;
+      const newState = `parent responder has been released`;
 
       this.setState((state) => {
         const parentStateText = this.getNewStateText(state.parentStateText, newState, e);
         return { parentStateText };
       });
     } else if (type === NodeType.ChildOne) {
-      const newState = `child one responder have been released`;
+      const newState = `child one responder has been released`;
 
       this.setState((state) => {
         const childOneStateText = this.getNewStateText(state.childOneStateText, newState, e);
         return { childOneStateText };
       });
     } else if (type === NodeType.ChildTwo) {
-      const newState = `child two responder have been released`;
+      const newState = `child two responder has been released`;
 
       this.setState((state) => {
         const childTwoStateText = this.getNewStateText(state.childTwoStateText, newState, e);
