@@ -1,3 +1,7 @@
+# 1.0.10
+
+- update readme and keywords
+
 # 1.0.9
 
 - fix event which is passed to responder
