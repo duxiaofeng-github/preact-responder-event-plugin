@@ -1,6 +1,14 @@
 {
   "name": "preact-responder-event-plugin",
   "version": "1.0.9",
+  "keywords": [
+    "react",
+    "react native",
+    "react native web",
+    "preact",
+    "gesture responder system",
+    "react dom"
+  ],
   "description": "a library combine react-native-web and preact together",
   "license": "MIT",
   "main": "dist/index.js",
