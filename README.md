@@ -1,5 +1,7 @@
 # [preact-responder-event-plugin](https://github.com/duxiaofeng-github/preact-responder-event-plugin)
 
+[![HitCount](http://hits.dwyl.io/duxiaofeng-github/preact-responder-event-plugin.svg)](http://hits.dwyl.io/duxiaofeng-github/preact-responder-event-plugin)
+
 This library implement the react native's `Gesture Responder System` which is required by react-native-web.
 
 It brings the [preact](https://github.com/preactjs/preact) and [react-native-web](https://github.com/necolas/react-native-web) together like what react-dom does for react and react-native-web. Now you can build a react native app into web app by using preact.
