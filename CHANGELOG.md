@@ -1,3 +1,7 @@
+# 1.0.12
+
+- [#1](https://github.com/duxiaofeng-github/preact-responder-event-plugin/pull/1) Old \_root hook should be called with apply to avoid wrong behaviour
+
 # 1.0.11
 
 - fix crash when preact is committing
