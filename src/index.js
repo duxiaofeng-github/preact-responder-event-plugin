@@ -12,7 +12,7 @@ options._root = function (node) {
     removeEventListenerToDocument();
   }
 
-  if (oldRootHook) { oldRootHook(node); }
+  if (oldRootHook) { oldRootHook.apply(null, arguments); }
 };
 
 var oldCommitHook = options._commit;
@@ -44,7 +44,7 @@ options._commit = function (node) {
     }
   }
 
-  if (oldCommitHook) { oldCommitHook(node); }
+  if (oldCommitHook) { oldCommitHook.apply(null, arguments); }
 };
 
 var ProcessType;

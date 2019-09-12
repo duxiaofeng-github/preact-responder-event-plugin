@@ -5,7 +5,7 @@ let root: VNode;
 
 const oldRootHook = (options as any)._root;
 
-(options as any)._root = (node: VNode) => {
+(options as any)._root = function (node: VNode) {
   root = node;
 
   if (root != null) {
@@ -14,12 +14,12 @@ const oldRootHook = (options as any)._root;
     removeEventListenerToDocument();
   }
 
-  if (oldRootHook) oldRootHook(node);
+  if (oldRootHook) oldRootHook.apply(null, arguments);
 };
 
 let oldCommitHook = (options as any)._commit;
 
-(options as any)._commit = (node: VNode) => {
+(options as any)._commit = function (node: VNode) {
   if (root && getPlugin()) {
     const vnodes = [root];
 
@@ -45,7 +45,7 @@ let oldCommitHook = (options as any)._commit;
     }
   }
 
-  if (oldCommitHook) oldCommitHook(node);
+  if (oldCommitHook) oldCommitHook.apply(null, arguments);
 };
 
 enum ProcessType {
