@@ -6,7 +6,7 @@ const mangleJson = require("./mangle.json");
 function getMangleContent(preactMangle) {
   preactMangle.props.props = Object.assign({}, preactMangle.props.props, mangleJson.props.props);
 
-  return JSON.stringify(preactMangle);
+  return JSON.stringify(preactMangle, null, 2);
 }
 
 axios
