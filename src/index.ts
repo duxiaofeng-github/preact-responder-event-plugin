@@ -361,12 +361,6 @@ function eventListener(e: Event) {
 
   if (!plugin) return;
 
-  const { p, pr } = getEventPaths(e as IEvent);
-  const checkers = getCheckers(e.type, p as HTMLElement[], pr as HTMLElement[]);
-  if (checkers.length === 0) {
-    return;
-  }
-
   const result = plugin.extractEvents(e.type, {}, e, e.target as HTMLElement);
   if (result == null) {
     return;
@@ -374,6 +368,9 @@ function eventListener(e: Event) {
 
   (e as IEvent).nativeEvent = result.nativeEvent;
   (e as any).persist = noop;
+
+  const { p, pr } = getEventPaths(e as IEvent);
+  const checkers = getCheckers(e.type, p as HTMLElement[], pr as HTMLElement[]);
 
   executeResponder(e as IEvent, checkers);
 }
