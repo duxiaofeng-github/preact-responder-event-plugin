@@ -5,7 +5,7 @@ let root: VNode;
 
 const oldRootHook = (options as any)._root;
 
-(options as any)._root = function (node: VNode) {
+(options as any)._root = function(node: VNode) {
   root = node;
 
   if (root != null) {
@@ -19,7 +19,7 @@ const oldRootHook = (options as any)._root;
 
 let oldCommitHook = (options as any)._commit;
 
-(options as any)._commit = function (node: VNode) {
+(options as any)._commit = function(node: VNode) {
   if (root && getPlugin()) {
     const vnodes = [root];
 
@@ -361,17 +361,19 @@ function eventListener(e: Event) {
 
   if (!plugin) return;
 
-  const result = plugin.extractEvents(e.type, {}, e, e.target as HTMLElement);
+  const { p, pr } = getEventPaths(e as IEvent);
+  const checkers = getCheckers(e.type, p as HTMLElement[], pr as HTMLElement[]);
+  if (checkers.length === 0) {
+    return;
+  }
 
+  const result = plugin.extractEvents(e.type, {}, e, e.target as HTMLElement);
   if (result == null) {
     return;
   }
 
   (e as IEvent).nativeEvent = result.nativeEvent;
   (e as any).persist = noop;
-
-  const { p, pr } = getEventPaths(e as IEvent);
-  const checkers = getCheckers(e.type, p as HTMLElement[], pr as HTMLElement[]);
 
   executeResponder(e as IEvent, checkers);
 }
