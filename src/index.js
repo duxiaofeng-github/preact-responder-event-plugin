@@ -331,15 +331,6 @@ function noop() {}
 function eventListener(e) {
   var plugin = getPlugin();
   if (!plugin) { return; }
-  var ref = getEventPaths(e);
-  var p = ref.p;
-  var pr = ref.pr;
-  var checkers = getCheckers(e.type, p, pr);
-
-  if (checkers.length === 0) {
-    return;
-  }
-
   var result = plugin.extractEvents(e.type, {}, e, e.target);
 
   if (result == null) {
@@ -348,6 +339,10 @@ function eventListener(e) {
 
   e.nativeEvent = result.nativeEvent;
   e.persist = noop;
+  var ref = getEventPaths(e);
+  var p = ref.p;
+  var pr = ref.pr;
+  var checkers = getCheckers(e.type, p, pr);
   executeResponder(e, checkers);
 }
 
