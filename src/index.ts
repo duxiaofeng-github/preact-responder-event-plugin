@@ -351,6 +351,11 @@ function executeResponder(e: IEvent, checker: ICheckerWrapper[]) {
   }
 }
 
+/**
+ * Noop function used for mocking React Syntethic methods
+ */
+function noop() {}
+
 function eventListener(e: Event) {
   const plugin = getPlugin();
 
@@ -363,6 +368,7 @@ function eventListener(e: Event) {
   }
 
   (e as IEvent).nativeEvent = result.nativeEvent;
+  (e as any).persist = noop;
 
   const { p, pr } = getEventPaths(e as IEvent);
   const checkers = getCheckers(e.type, p as HTMLElement[], pr as HTMLElement[]);
