@@ -5335,10 +5335,10 @@ posix-character-classes@^0.1.0:
   resolved "https://registry.npm.taobao.org/posix-character-classes/download/posix-character-classes-0.1.1.tgz#01eac0fe3b5af71a2a6c02feabb8c1fef7e00eab"
   integrity sha1-AerA/jta9xoqbAL+q7jB/vfgDqs=
 
-preact-responder-event-plugin@1.0.9:
-  version "1.0.9"
-  resolved "https://registry.npmjs.org/preact-responder-event-plugin/-/preact-responder-event-plugin-1.0.9.tgz#2f706e3540c74112e387f00c4019fc0319411fbb"
-  integrity sha512-DsZuQbW9+Wcw4RNoAympUvtPDfiRLjO9fF7m/VeFSkKAx6vfHy6GaxOGt+x4bX+0iEHIbIgKA2lA+FuW5BZn3w==
+preact-responder-event-plugin@1.0.14:
+  version "1.0.14"
+  resolved "https://registry.npmjs.org/preact-responder-event-plugin/-/preact-responder-event-plugin-1.0.14.tgz#488ec6224a9b5958bdf9011a94be49f4e58ff18a"
+  integrity sha512-XM5jeLUfqjRtfAjK62TjWaQ7VrSVu3Q+yiL/ezSabQMuYRjecQiPczazc0TDg2X+9rUKnT6WtK0JFvEZW+PgKg==
 
 preact@^10.0.0-rc.1:
   version "10.0.0-rc.1"
