@@ -1,3 +1,9 @@
+# 1.0.13
+
+- add nativeEvent to e if there is at least one checker
+
+- [#2](https://github.com/duxiaofeng-github/preact-responder-event-plugin/pull/2)(fix) Mock persist method for syntethic events
+
 # 1.0.12
 
 - [#1](https://github.com/duxiaofeng-github/preact-responder-event-plugin/pull/1) Old \_root hook should be called with apply to avoid wrong behaviour
