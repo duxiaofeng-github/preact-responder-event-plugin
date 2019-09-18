@@ -1,3 +1,7 @@
+# 1.0.14
+
+- adjust code order to ensure plugin.extractEvents must be excuted
+
 # 1.0.13
 
 - add nativeEvent to e if there is at least one checker
