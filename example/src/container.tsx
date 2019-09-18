@@ -1,5 +1,6 @@
 import React from "react";
 import { View, StyleSheet, Text, Switch, GestureResponderEvent, Platform } from "react-native";
+import { MoreExamples } from "./more-examples";
 
 interface IProps {}
 
@@ -15,6 +16,7 @@ interface IState {
   isParentResponding: boolean;
   isChildOneResponding: boolean;
   isChildTwoResponding: boolean;
+  isShowMoreExample: boolean;
 }
 
 enum NodeType {
@@ -36,6 +38,7 @@ export class Container extends React.Component<IProps, IState> {
     isParentResponding: false,
     isChildOneResponding: false,
     isChildTwoResponding: false,
+    isShowMoreExample: false,
   };
 
   render() {
@@ -52,6 +55,16 @@ export class Container extends React.Component<IProps, IState> {
       isChildOneResponding,
       isChildTwoResponding,
     } = this.state;
+
+    if (this.state.isShowMoreExample) {
+      return (
+        <MoreExamples
+          back={() => {
+            this.setState({ isShowMoreExample: false });
+          }}
+        />
+      );
+    }
 
     return (
       <View style={[style.container, { userSelect: "none" } as any]}>
@@ -197,6 +210,17 @@ export class Container extends React.Component<IProps, IState> {
               }}
             >
               Clear all logs
+            </Text>
+            <Text
+              style={style.clearButton}
+              accessibilityRole="link"
+              onPress={() => {
+                this.setState({
+                  isShowMoreExample: true,
+                });
+              }}
+            >
+              Show more examples
             </Text>
           </View>
         </View>
@@ -660,5 +684,6 @@ const style = StyleSheet.create({
     backgroundColor: "gray",
     padding: 20,
     textAlign: "center",
+    marginTop: 10,
   },
 });
