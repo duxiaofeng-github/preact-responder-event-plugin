@@ -6,7 +6,7 @@
     "lib": ["es6", "dom"],
     "moduleResolution": "node",
     "strict": true,
-    "target": "es5",
+    "target": "esnext",
     "baseUrl": "./",
     "paths": {
       "*": ["*", "*.web", "*.native", "*.ios", "*.android"]

@@ -5340,10 +5340,10 @@ preact-responder-event-plugin@1.0.14:
   resolved "https://registry.npmjs.org/preact-responder-event-plugin/-/preact-responder-event-plugin-1.0.14.tgz#488ec6224a9b5958bdf9011a94be49f4e58ff18a"
   integrity sha512-XM5jeLUfqjRtfAjK62TjWaQ7VrSVu3Q+yiL/ezSabQMuYRjecQiPczazc0TDg2X+9rUKnT6WtK0JFvEZW+PgKg==
 
-preact@^10.0.0-rc.1:
-  version "10.0.0-rc.1"
-  resolved "https://registry.npmjs.org/preact/-/preact-10.0.0-rc.1.tgz#bae4419f8e289c327504d4ee6e734c377983548c"
-  integrity sha512-DyG8ySCbrQZ8w4cSyxnofM6yH/hzyYLHmIrE3xL1FjSCX4DpvVmP7DTpkV535FSQX0d2zOscb7DCIY+crBtxow==
+preact@10.0.4:
+  version "10.0.4"
+  resolved "https://registry.npmjs.org/preact/-/preact-10.0.4.tgz#7c1a2e074ea64a2d3c83349f7f55304ed0e017a7"
+  integrity sha512-x9QW91LVQZ4lkMZ8gOucyaW1414MEtgSC//JwlxR0nfq/QEdbaLQZrWFFWgjtGyNBBXg2P0TZ6u6W+XlpjcK2Q==
 
 pretty-error@^2.0.2:
   version "2.1.1"

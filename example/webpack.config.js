@@ -23,7 +23,7 @@ module.exports = {
   resolve: {
     extensions: [".tsx", ".ts", ".js"],
     alias: {
-      "react-native$": "react-native-web",
+      "react-native$": "react-native-web/dist/index.js",
       react$: "preact/compat",
       "react-dom$": "preact/compat",
       "react-dom/unstable-native-dependencies$": "preact-responder-event-plugin",

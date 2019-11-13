@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "webpack-dev-server --hot",
-    "build": "webpack --mode production"
+    "build": "webpack --mode production --display-modules"
   },
   "devDependencies": {
     "@types/react": "^16.9.2",
@@ -18,7 +18,7 @@
     "webpack-dev-server": "^3.8.0"
   },
   "dependencies": {
-    "preact": "^10.0.0-rc.1",
+    "preact": "10.0.4",
     "preact-responder-event-plugin": "1.0.14",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",

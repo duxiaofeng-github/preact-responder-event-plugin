@@ -29,7 +29,7 @@ All you need to do is add some aliases in your webpack config to replace the `re
 ```
   resolve: {
     alias: {
-      "react-native$": "react-native-web",
+      "react-native$": "react-native-web/dist/index.js",
       react$: "preact/compat",
       "react-dom$": "preact/compat",
       "react-dom/unstable-native-dependencies$": "preact-responder-event-plugin",
