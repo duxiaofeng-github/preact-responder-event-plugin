@@ -1,3 +1,11 @@
+# 1.0.16
+
+- fix yarn.lock
+
+# 1.0.15
+
+- fix compatible issue on firefox and safari
+
 # 1.0.14
 
 - adjust code order to ensure plugin.extractEvents must be excuted

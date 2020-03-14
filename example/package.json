@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "preact": "10.0.4",
-    "preact-responder-event-plugin": "1.0.14",
+    "preact-responder-event-plugin": "^1.0.15",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-native": "^0.60.5",

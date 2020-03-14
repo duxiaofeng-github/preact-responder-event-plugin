@@ -155,8 +155,7 @@ function getCheckers(eventType, eventPath, eventPathReverse) {
 }
 
 function getEventPaths(e) {
-  var composedPath = e.composedPath;
-  var path = e.path || (composedPath != null ? composedPath() : getEventPath(e));
+  var path = e.path || (e.composedPath != null ? e.composedPath() : getEventPath(e));
   var pathReverse = path.concat([]).reverse();
   return {
     p: path,
