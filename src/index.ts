@@ -191,7 +191,6 @@ function getCheckers(eventType: string, eventPath: HTMLElement[], eventPathRever
 }
 
 function getEventPaths(e: IEvent) {
-  const composedPath = e.composedPath;
   const path = (e as any).path || (e.composedPath != null ? e.composedPath() : getEventPath(e));
   const pathReverse = path.concat([]).reverse();
 
