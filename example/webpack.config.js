@@ -24,9 +24,10 @@ module.exports = {
     extensions: [".tsx", ".ts", ".js"],
     alias: {
       "react-native$": "react-native-web/dist/index.js",
-      react$: "preact/compat",
-      "react-dom$": "preact/compat",
-      "react-dom/unstable-native-dependencies$": "preact-responder-event-plugin",
+      react$: "preact/compat/src/index.js",
+      preact$: "preact/src/index.js",
+      "react-dom$": "preact/compat/src/index.js",
+      "react-dom/unstable-native-dependencies$": "preact-responder-event-plugin/src/index.js",
     },
   },
   plugins: [
